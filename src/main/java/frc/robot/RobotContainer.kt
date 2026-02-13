@@ -8,9 +8,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton
 import frc.robot.commands.Kommand.drive
 import frc.robot.commands.Kommand.resetPidgey
 import frc.robot.commands.Kommand.setTelePid
+import frc.robot.subsystems.Intake
 import frc.robot.subsystems.LED
 import frc.robot.subsystems.PhotonVision
 import frc.robot.subsystems.Swerve
+import frc.robot.subsystems.Transport
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 import xyz.malefic.frc.emu.Button.START
 import xyz.malefic.frc.emu.Button.Y
@@ -33,6 +35,8 @@ class RobotContainer {
             Swerve,
             LED,
             PhotonVision,
+            Intake,
+            Transport
         )
 
         val pad = XboxController(0)
