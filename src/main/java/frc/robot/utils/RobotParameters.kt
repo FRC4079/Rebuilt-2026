@@ -4,14 +4,60 @@ import com.ctre.phoenix6.signals.InvertedValue
 import com.pathplanner.lib.config.PIDConstants
 import com.pathplanner.lib.config.RobotConfig
 import com.pathplanner.lib.controllers.PPHolonomicDriveController
+import edu.wpi.first.math.geometry.Pose3d
+import edu.wpi.first.math.geometry.Rotation3d
+import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics
+import edu.wpi.first.math.util.Units
 import frc.robot.utils.emu.IntakeState
 import frc.robot.utils.emu.TransportState
+import frc.robot.utils.emu.ShooterState
+import frc.robot.utils.emu.SwerveDriveState
+import frc.robot.utils.emu.HoodState
 import xyz.malefic.frc.pingu.control.Pingu
 
 /** Class containing global values for the robot.  */
 object RobotParameters {
+
+    /**
+     * Class containing global values related to the game's state like our team color and the hub cycle.
+     */
+    object GameParameters {
+        // should probably change this to an enum later for scalability (even if not needed) - Sam
+
+        /**
+         * The team color of the robot, either "Red" or "Blue", Used to determine hub location for shooting.
+         */
+        var teamColor : String = "Red"
+
+        /**
+         * Boolean indicating if the hub is active first in the game cycle.  True if hub is active first, false otherwise. Should be controlled on TeleOp init by driver.
+         */
+        var isHubActiveFirst : Boolean = true
+    }
+
+    /**
+     * Class containing global values related to the field, such as dimensions and hub locations.
+     */
+    object FieldParameters {
+        // Because imperial sucks.
+        val FIELD_WIDTH : Double = Units.inchesToMeters(317.7)
+        val FIELD_HEIGHT : Double = Units.inchesToMeters(651.2)
+        val BLUE_HUB_SCORE_POSITION: Pose3d = Pose3d(Units.inchesToMeters(158.83), Units.inchesToMeters(158.85), Units.inchesToMeters(72.0), Rotation3d.kZero)
+        val RED_HUB_SCORE_POSITION: Pose3d = Pose3d(FIELD_WIDTH - Units.inchesToMeters(158.83), Units.inchesToMeters(158.85), Units.inchesToMeters(72.0), Rotation3d.kZero)
+        val BLUE_ALLIANCE_ZONE_BOUNDARY: Double = BLUE_HUB_SCORE_POSITION.x
+        val RED_ALLIANCE_ZONE_BOUNDARY: Double = RED_HUB_SCORE_POSITION.x
+    }
+
+    object BallParameters {
+        // Because imperial sucks.
+        val MASS_KG : Double = 0.2032
+        val RADIUS_M: Double = Units.inchesToMeters(5.9) / 2.0
+        val GRAVITY: Double = 9.81
+    }
+
     /** Class containing global values related to motors.  */
     object MotorParameters {
         // Motor CAN ID Values
@@ -34,6 +80,9 @@ object RobotParameters {
         const val END_EFFECTOR_MOTOR_ID: Int = 17
         const val CORAL_MANIPULATOR_MOTOR_UP_ID: Int = 18
         const val CORAL_MANIPULATOR_MOTOR_DOWN_ID: Int = 19
+        const val SHOOTER_CLOCKWISE_MOTOR_ID: Int = 20
+        const val SHOOTER_COUNTER_MOTOR_ID: Int = 21
+        const val SHOOTER_HOOD_MOTOR_ID: Int = 22
         const val INTAKE_MOTOR_ID : Int = 23
         const val HOPPER_MOTOR_ID : Int = 24
         const val INDEXER_MOTOR_ID : Int = 25
@@ -55,6 +104,9 @@ object RobotParameters {
 
     /** Class containing global values related to the swerve drive system.  */
     object SwerveParameters {
+        var swerveState: SwerveDriveState = SwerveDriveState.FIELD_ORIENTED
+        var slowmode: Boolean = false
+
         const val PATHPLANNER_AUTO_NAME: String = "4l4auto"
 
         const val AUTO_ALIGN_SWERVE_LEFT: Double = -0.1
@@ -162,6 +214,30 @@ object RobotParameters {
         var transportState : TransportState = TransportState.ON
         val HOPPER_MOTOR_PINGU = Pingu(0.5, 0.0, 0.0, 1.0)
         val INDEXER_MOTOR_PINGU = Pingu(0.5, 0.0, 0.0, 1.0)
+    }
+
+    /**
+     * Class containing global values for the Shooter + hood.
+     */
+    object ShooterParameters {
+        const val SHOOTER_MOTOR_INVERTED: Boolean = false
+        const val FEEDER_MOTOR_INVERTED: Boolean = false
+
+        val COUNTER_PINGU  = Pingu(0.1, 0.0, 0.0, 0.0)
+        val CLOCKWISE_PINGU = Pingu(0.1, 0.0, 0.0, 0.0)
+        val HOOD_PINGU = Pingu(0.1, 0.0, 0.0, 0.0)
+
+        var shooterState: ShooterState = ShooterState.OFF
+        var hoodState: HoodState = HoodState.STOP
+
+        /**
+         * An interpolating map that relates distance to target in meters to the required shooter RPM. Values taken from FRC-868.
+         */
+        val SHOOTER_RPM_SCALING : InterpolatingDoubleTreeMap = InterpolatingDoubleTreeMap().apply {
+            put(2.07, 7.0)
+            put(4.97, 9.0)
+        }
+        val SHOOTER_POSE_OFFSET = Transform3d(0.0, 0.0, 0.0, Rotation3d.kZero)
     }
 
     /** Class containing constants for the Photonvision subsystem.  */
