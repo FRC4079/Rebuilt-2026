@@ -19,7 +19,7 @@ object Transport : SubsystemBase() {
         TonguFX(INDEXER_MOTOR_ID, velocitySetter, { out -> this.withVelocity(out) }) {
             pingu = INDEXER_MOTOR_PINGU
             neutralMode = NeutralModeValue.Brake
-            inverted = InvertedValue.Clockwise_Positive
+            inverted = InvertedValue.CounterClockwise_Positive
             name = "Index Motor"
         }
 

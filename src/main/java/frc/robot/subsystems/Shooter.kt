@@ -37,7 +37,7 @@ object Shooter : SubsystemBase() {
         TonguFX( SHOOTER_COUNTER_MOTOR_ID, voltageControl, { out -> this.withVelocity(out) }) {
             pingu = COUNTER_PINGU
             neutralMode = NeutralModeValue.Brake
-            inverted = InvertedValue.CounterClockwise_Positive
+            inverted = InvertedValue.Clockwise_Positive
             name = "Shooter Motor Counter"
         }
 
@@ -61,8 +61,11 @@ object Shooter : SubsystemBase() {
             SwerveDriveState.SHOOTING -> {HoodState.TRACKING}
         }
 
-        aimHoodAtTarget(ShooterCalculator.currentInterceptSolution)
-        setShooterSpeed(-shooterState.velocity, shooterState.velocity)
+        if (hoodState == HoodState.TRACKING) {
+            aimHoodAtTarget(ShooterCalculator.currentInterceptSolution)
+        }
+
+        setShooterSpeed(shooterState.velocity)
     }
 
     /**
@@ -72,9 +75,9 @@ object Shooter : SubsystemBase() {
      * @param counterSpeed The speed for the counter motor.
      */
 
-    fun setShooterSpeed(clockwiseSpeed: Double, counterSpeed: Double) {
-        shooterMotorClockwise.setControl(voltageControl.withVelocity(clockwiseSpeed))
-        shooterMotorCounter.setControl(voltageControl.withVelocity(counterSpeed))
+    fun setShooterSpeed(speed: Double) {
+        shooterMotorClockwise.setControl(voltageControl.withVelocity(speed))
+        shooterMotorCounter.setControl(voltageControl.withVelocity(speed))
     }
 
 //    fun setHoodSpeed(hoodPos: Double) {

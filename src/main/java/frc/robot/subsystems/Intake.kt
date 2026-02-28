@@ -8,12 +8,23 @@ import xyz.malefic.frc.pingu.motor.talonfx.TonguFX
 import frc.robot.utils.RobotParameters.IntakeParameters.INTAKE_MOTOR_PINGU
 import frc.robot.utils.RobotParameters.MotorParameters.INTAKE_MOTOR_ID
 import frc.robot.utils.RobotParameters.IntakeParameters.intakeState
+import frc.robot.utils.RobotParameters.IntakeParameters.intakePivotState
 import frc.robot.utils.emu.IntakeState
+import com.ctre.phoenix6.controls.PositionVoltage
+import frc.robot.utils.emu.IntakePivotState
 
 object Intake : SubsystemBase() {
     private val velocitySetter = VelocityTorqueCurrentFOC(0.0)
+    private val positionSetter = PositionVoltage(0.0)
 
     private val intakeMotor =
+        TonguFX(INTAKE_MOTOR_ID, velocitySetter, { out -> this.withVelocity(out) }) {
+            pingu = INTAKE_MOTOR_PINGU
+            neutralMode = NeutralModeValue.Brake
+            inverted = InvertedValue.CounterClockwise_Positive
+            name = "Intake Motor"
+        }
+    private val intakePivotMotor =
         TonguFX(INTAKE_MOTOR_ID, velocitySetter, { out -> this.withVelocity(out) }) {
             pingu = INTAKE_MOTOR_PINGU
             neutralMode = NeutralModeValue.Brake
@@ -23,9 +34,19 @@ object Intake : SubsystemBase() {
 
     override fun periodic() {
         setIntakeVelocity(intakeState.velocity)
+        when (intakeState) {
+            IntakeState.STOP -> movePivot(IntakePivotState.UP)
+            IntakeState.INTAKE -> movePivot(IntakePivotState.DOWN)
+            IntakeState.OUTTAKE -> print("no")
+        }
     }
 
     fun setIntakeVelocity(speed : Double) {
         intakeMotor.setControl(velocitySetter.withVelocity(speed))
+    }
+
+    fun movePivot(state: IntakePivotState){
+        intakePivotState = state
+        intakePivotMotor.setControl(positionSetter.withPosition(state.position))
     }
 }

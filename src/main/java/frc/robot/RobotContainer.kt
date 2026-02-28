@@ -15,8 +15,14 @@ import frc.robot.subsystems.Shooter
 import frc.robot.subsystems.ShooterCalculator
 import frc.robot.subsystems.Swerve
 import frc.robot.subsystems.Transport
+import frc.robot.utils.RobotParameters.IntakeParameters.intakePivotState
+import frc.robot.utils.RobotParameters.IntakeParameters.intakeState
 import frc.robot.utils.RobotParameters.SwerveParameters.swerveState
+import frc.robot.utils.RobotParameters.TransportParameters.transportState
+import frc.robot.utils.emu.IntakePivotState
+import frc.robot.utils.emu.IntakeState
 import frc.robot.utils.emu.SwerveDriveState
+import frc.robot.utils.emu.TransportState
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 import xyz.malefic.frc.emu.Button
 import xyz.malefic.frc.emu.Button.START
@@ -64,8 +70,16 @@ class RobotContainer {
         pad.bindings {
             press(Y) { setTelePid() }
             press(START) { resetPidgey() }
-            hold(Button.RIGHT_TRIGGER) { swerveState = SwerveDriveState.SHOOTING}
+
+            hold(Button.RIGHT_TRIGGER) { swerveState = SwerveDriveState.SHOOTING }
             release(Button.RIGHT_TRIGGER) { swerveState = SwerveDriveState.FIELD_ORIENTED }
+            hold(Button.LEFT_TRIGGER) { intakeState = IntakeState.INTAKE }
+            release(Button.LEFT_TRIGGER) { intakeState = IntakeState.STOP }
+
+            press(Button.A) { intakePivotState = IntakePivotState.DOWN }
+            press(Button.B) { intakePivotState = IntakePivotState.UP }
+            hold(Button.X) { transportState = TransportState.ON }
+            release(Button.X) { transportState = TransportState.STOP }
         }
     }
 

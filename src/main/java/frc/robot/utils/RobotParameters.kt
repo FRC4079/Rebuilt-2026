@@ -16,6 +16,7 @@ import frc.robot.utils.emu.TransportState
 import frc.robot.utils.emu.ShooterState
 import frc.robot.utils.emu.SwerveDriveState
 import frc.robot.utils.emu.HoodState
+import frc.robot.utils.emu.IntakePivotState
 import xyz.malefic.frc.pingu.control.Pingu
 
 /** Class containing global values for the robot.  */
@@ -106,6 +107,7 @@ object RobotParameters {
     object SwerveParameters {
         var swerveState: SwerveDriveState = SwerveDriveState.FIELD_ORIENTED
         var slowmode: Boolean = false
+        var aimedWellEnough: Boolean = false
 
         const val PATHPLANNER_AUTO_NAME: String = "4l4auto"
 
@@ -138,6 +140,8 @@ object RobotParameters {
             val DIST_PID: Pingu = Pingu(0.2, 0.0, 0.0)
             val PASS_ROTATIONAL_PID: Pingu = Pingu(0.1, 0.0, 0.0)
 
+            val VISION_TURN_kP: Double = 0.02
+
             var pathFollower: PPHolonomicDriveController =
                 PPHolonomicDriveController(
                     PIDConstants(5.0, 0.00, 0.0), // translation
@@ -155,7 +159,6 @@ object RobotParameters {
                 }
             }
         }
-
         /** Class containing physical dimensions and kinematics for the swerve drive system.  */
         object PhysicalParameters {
             const val ROBOT_SIZE: Double = 0.43105229381
@@ -205,13 +208,14 @@ object RobotParameters {
     object IntakeParameters {
         val INTAKE_MOTOR_PINGU = Pingu(0.5, 0.0, 0.0, 1.0)
         var intakeState: IntakeState = IntakeState.STOP
+        var intakePivotState: IntakePivotState = IntakePivotState.UP
     }
 
     /**
      * Class containing global values for the Hopper and Indexer.
      */
     object TransportParameters {
-        var transportState : TransportState = TransportState.ON
+        var transportState : TransportState = TransportState.STOP
         val HOPPER_MOTOR_PINGU = Pingu(0.5, 0.0, 0.0, 1.0)
         val INDEXER_MOTOR_PINGU = Pingu(0.5, 0.0, 0.0, 1.0)
     }

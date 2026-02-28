@@ -50,6 +50,8 @@ object PhotonVision : SubsystemBase() {
         private set
     var dist: Double = 0.0
         private set
+    var fiducialId: Int = 0
+        private set
 
     /**
      * Gets the current target pose ambiguity.
@@ -98,6 +100,7 @@ object PhotonVision : SubsystemBase() {
             yaw = tag.getYaw()
             y = tag.getBestCameraToTarget().x
             dist = tag.getBestCameraToTarget().z
+            fiducialId = tag.fiducialId
         }
 
         "yaw to target" log yaw
