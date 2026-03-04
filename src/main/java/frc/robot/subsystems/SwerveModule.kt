@@ -180,7 +180,7 @@ class SwerveModule(
         steerVelocity = steerMotor.velocity.valueAsDouble
         steerPosition = steerMotor.position.valueAsDouble
 
-        initializeLoggedNetworkPID()
+//        initializeLoggedNetworkPID()
         initializeAlarms(driveId, steerId, canCoderID)
     }
 

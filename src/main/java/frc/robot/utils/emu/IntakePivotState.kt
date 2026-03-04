@@ -2,15 +2,13 @@ package frc.robot.utils.emu
 
 /**
  * An enum representing the state of the intake.
- * @property velocity The velocity per state, used to set the motor speed.
+ * @property position Position per state, ahhauhahh.
  */
-enum class IntakeState (
-    val velocity: Double,
+enum class IntakePivotState (
+    val position: Double,
 ) {
     /** Represents the intake motor at full power clockwise, intaking. */
-    INTAKE(8.0),
+    DOWN(10.0),
     /** Represents the intake motor at full power counter-clockwise, if you for some reason need this. */
-    OUTTAKE(-1.0),
-    /** Represents the intake motor stopped at 0.0 velocity. */
-    STOP(0.0),
+    UP(0.0),
 }

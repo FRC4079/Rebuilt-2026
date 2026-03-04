@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.geometry.Translation3d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import frc.robot.utils.ChassisAccelerations
+import java.math.RoundingMode
 import java.util.function.Function
 import kotlin.math.abs
 import kotlin.math.atan
@@ -192,7 +193,7 @@ object ShooterCalculator : SubsystemBase() {
         return ShotSolution(launchPitch, launchSpeed, time)
     }
 
-    private fun solveShootOnTheFly(
+    internal fun solveShootOnTheFly(
         shooterPose3d: Pose3d,
         targetPose3d: Pose3d,
         fieldRelRobotVelocity: ChassisSpeeds,
@@ -222,9 +223,9 @@ object ShooterCalculator : SubsystemBase() {
             if(abs(newSolution.flightTimeSeconds - time) < timeTolerance) {
                 return InterceptSolution(
                     effectiveTargetPose3d,
-                    newSolution.launchPitch,
+                    newSolution.launchPitch.toBigDecimal().setScale(1, RoundingMode.UP).toDouble(),
                     newSolution.launchSpeed,
-                    newSolution.flightTimeSeconds,
+                    newSolution.flightTimeSeconds.toBigDecimal().setScale(1, RoundingMode.UP).toDouble(),
                     0.0
                 )
             }
@@ -235,9 +236,9 @@ object ShooterCalculator : SubsystemBase() {
 
         return InterceptSolution(
             effectiveTargetPose3d,
-            solution.launchPitch,
+            solution.launchPitch.toBigDecimal().setScale(1, RoundingMode.UP).toDouble(),
             solution.launchSpeed,
-            solution.flightTimeSeconds,
+            solution.flightTimeSeconds.toBigDecimal().setScale(1, RoundingMode.UP).toDouble(),
             0.0
         )
     }

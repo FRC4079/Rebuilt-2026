@@ -11,15 +11,23 @@ import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.util.Units
+import edu.wpi.first.wpilibj.XboxController
 import frc.robot.utils.emu.IntakeState
 import frc.robot.utils.emu.TransportState
 import frc.robot.utils.emu.ShooterState
 import frc.robot.utils.emu.SwerveDriveState
 import frc.robot.utils.emu.HoodState
+import frc.robot.utils.emu.IntakePivotState
+import xyz.malefic.frc.pingu.control.MagicPingu
 import xyz.malefic.frc.pingu.control.Pingu
 
 /** Class containing global values for the robot.  */
 object RobotParameters {
+
+    object ControllerConstants {
+        val aacrn = XboxController(0)
+        val testPad = XboxController(1)
+    }
 
     /**
      * Class containing global values related to the game's state like our team color and the hub cycle.
@@ -61,39 +69,34 @@ object RobotParameters {
     /** Class containing global values related to motors.  */
     object MotorParameters {
         // Motor CAN ID Values
-        const val FRONT_LEFT_STEER_ID: Int = 1
-        const val FRONT_LEFT_DRIVE_ID: Int = 2
-        const val FRONT_RIGHT_STEER_ID: Int = 3
-        const val FRONT_RIGHT_DRIVE_ID: Int = 4
-        const val BACK_LEFT_STEER_ID: Int = 5
-        const val BACK_LEFT_DRIVE_ID: Int = 6
-        const val BACK_RIGHT_STEER_ID: Int = 7
-        const val BACK_RIGHT_DRIVE_ID: Int = 8
-        const val FRONT_LEFT_CAN_CODER_ID: Int = 9
-        const val FRONT_RIGHT_CAN_CODER_ID: Int = 10
-        const val BACK_LEFT_CAN_CODER_ID: Int = 11
-        const val BACK_RIGHT_CAN_CODER_ID: Int = 12
-        const val ELEVATOR_MOTOR_LEFT_ID: Int = 13
-        const val ELEVATOR_MOTOR_RIGHT_ID: Int = 14
-        const val PIVOT_MOTOR_ID: Int = 15
-        const val PIDGEY_ID: Int = 16
-        const val END_EFFECTOR_MOTOR_ID: Int = 17
-        const val CORAL_MANIPULATOR_MOTOR_UP_ID: Int = 18
-        const val CORAL_MANIPULATOR_MOTOR_DOWN_ID: Int = 19
-        const val SHOOTER_CLOCKWISE_MOTOR_ID: Int = 20
-        const val SHOOTER_COUNTER_MOTOR_ID: Int = 21
-        const val SHOOTER_HOOD_MOTOR_ID: Int = 22
-        const val INTAKE_MOTOR_ID : Int = 23
-        const val HOPPER_MOTOR_ID : Int = 24
-        const val INDEXER_MOTOR_ID : Int = 25
+        const val FRONT_LEFT_STEER_ID: Int = 14
+        const val FRONT_LEFT_DRIVE_ID: Int = 15
+        const val FRONT_RIGHT_STEER_ID: Int = 1
+        const val FRONT_RIGHT_DRIVE_ID: Int = 0
+        const val BACK_LEFT_STEER_ID: Int = 13
+        const val BACK_LEFT_DRIVE_ID: Int = 12
+        const val BACK_RIGHT_STEER_ID: Int = 8
+        const val BACK_RIGHT_DRIVE_ID: Int = 9
+        const val FRONT_LEFT_CAN_CODER_ID: Int = 30
+        const val FRONT_RIGHT_CAN_CODER_ID: Int = 27
+        const val BACK_LEFT_CAN_CODER_ID: Int = 28
+        const val BACK_RIGHT_CAN_CODER_ID: Int = 29
+        const val PIDGEY_ID: Int = 26
+        const val SHOOTER_CLOCKWISE_MOTOR_ID: Int = 4
+        const val SHOOTER_COUNTER_MOTOR_ID: Int = 6
+        const val SHOOTER_HOOD_MOTOR_ID: Int = 5 //
+        const val INTAKE_MOTOR_ID : Int = 16
+        const val HOPPER_MOTOR_ID : Int = 3 //
+        const val INDEXER_MOTOR_ID : Int = 7
+        const val INTAKE_PIVOT_MOTOR_ID : Int = 2
 
         // Motor Property Values
         const val MAX_SPEED: Double = 5.76
         const val MAX_ANGULAR_SPEED: Double = (14 * Math.PI) / 3
         const val ENCODER_COUNTS_PER_ROTATION: Double = 1.0
-        const val STEER_MOTOR_GEAR_RATIO: Double = 150.0 / 7
-        const val DRIVE_MOTOR_GEAR_RATIO: Double = 6.750000000000000
-        const val WHEEL_DIAMETER: Double = 0.106
+        const val STEER_MOTOR_GEAR_RATIO: Double = 287.0/11.0
+        const val DRIVE_MOTOR_GEAR_RATIO: Double = 6.03/1.0
+        const val WHEEL_DIAMETER: Double = 0.1016
         const val METERS_PER_REV: Double = WHEEL_DIAMETER * Math.PI * 0.975
 
         // Limit Values
@@ -106,6 +109,7 @@ object RobotParameters {
     object SwerveParameters {
         var swerveState: SwerveDriveState = SwerveDriveState.FIELD_ORIENTED
         var slowmode: Boolean = false
+        var aimedWellEnough: Boolean = false
 
         const val PATHPLANNER_AUTO_NAME: String = "4l4auto"
 
@@ -115,11 +119,11 @@ object RobotParameters {
         /** Class containing PID constants for the swerve drive system.  */
         object PIDParameters {
             @JvmField
-            val STEER_PID_TELE = Pingu(250.0, 0.000, 20.0, 0.0)
+            val STEER_PID_TELE = Pingu(5.00,0.0, 0.000, 0.0, 0.0)
 
             // val STEER_PID_AUTO = Pingu(200.0, 0.000, 20.0, 0.0)
             @JvmField
-            val STEER_PID_AUTO = Pingu(750.0, 5.000, 15.0, 0.0)
+            val STEER_PID_AUTO = Pingu(5.0, 5.000, 15.0, 0.0)
             // val STEER_PID_AUTO = Pingu(5.0, 0.000, 0.0, 1.0)
 
             @JvmField
@@ -138,6 +142,8 @@ object RobotParameters {
             val DIST_PID: Pingu = Pingu(0.2, 0.0, 0.0)
             val PASS_ROTATIONAL_PID: Pingu = Pingu(0.1, 0.0, 0.0)
 
+            val VISION_TURN_kP: Double = 0.02
+
             var pathFollower: PPHolonomicDriveController =
                 PPHolonomicDriveController(
                     PIDConstants(5.0, 0.00, 0.0), // translation
@@ -155,7 +161,6 @@ object RobotParameters {
                 }
             }
         }
-
         /** Class containing physical dimensions and kinematics for the swerve drive system.  */
         object PhysicalParameters {
             const val ROBOT_SIZE: Double = 0.43105229381
@@ -186,7 +191,7 @@ object RobotParameters {
             const val USING_VISION: Boolean = false
             const val AUTO_ALIGN: Boolean = false
             const val MOTOR_DEADBAND: Double = 0.05
-            const val IS_FIELD_ORIENTED: Boolean = true
+            const val IS_FIELD_ORIENTED: Boolean = false
             const val SHOULD_INVERT: Boolean = false
             const val ENCODER_OFFSET: Double = (0 / 360.0)
             const val X_DEADZONE: Double = 0.15
@@ -202,18 +207,20 @@ object RobotParameters {
     /**
      * Class containing global values for the Intake.
      */
-    object IntakeParameters {
-        val INTAKE_MOTOR_PINGU = Pingu(0.5, 0.0, 0.0, 1.0)
+    object  IntakeParameters {
+        val INTAKE_MOTOR_PINGU = Pingu(0.3, 0.0, 0.0, 1.0)
+        val INTAKE_MOTOR_PIVOT_PINGU = Pingu(0.25, 0.0, 0.0, 0.5)
         var intakeState: IntakeState = IntakeState.STOP
+        var intakePivotState: IntakePivotState = IntakePivotState.UP
     }
 
     /**
      * Class containing global values for the Hopper and Indexer.
      */
     object TransportParameters {
-        var transportState : TransportState = TransportState.ON
-        val HOPPER_MOTOR_PINGU = Pingu(0.5, 0.0, 0.0, 1.0)
-        val INDEXER_MOTOR_PINGU = Pingu(0.5, 0.0, 0.0, 1.0)
+        var transportState : TransportState = TransportState.STOP
+        val HOPPER_MOTOR_PINGU = Pingu(0.1, 0.0, 0.0, 1.0)
+        val INDEXER_MOTOR_PINGU = Pingu(0.1, 0.0, 0.0, 1.0)
     }
 
     /**
@@ -223,8 +230,8 @@ object RobotParameters {
         const val SHOOTER_MOTOR_INVERTED: Boolean = false
         const val FEEDER_MOTOR_INVERTED: Boolean = false
 
-        val COUNTER_PINGU  = Pingu(0.1, 0.0, 0.0, 0.0)
-        val CLOCKWISE_PINGU = Pingu(0.1, 0.0, 0.0, 0.0)
+        val COUNTER_PINGU  = Pingu(0.1, 0.0, 0.0, 1.0)
+        val CLOCKWISE_PINGU = Pingu(0.1, 0.0, 0.0, 1.0)
         val HOOD_PINGU = Pingu(0.1, 0.0, 0.0, 0.0)
 
         var shooterState: ShooterState = ShooterState.OFF
