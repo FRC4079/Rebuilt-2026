@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.utils.ChassisAccelerations
+import frc.robot.utils.RobotParameters.ControllerConstants.aacrn
 import frc.robot.utils.RobotParameters.MotorParameters
 import frc.robot.utils.RobotParameters.MotorParameters.MAX_ANGULAR_SPEED
 import frc.robot.utils.RobotParameters.MotorParameters.MAX_SPEED
@@ -213,10 +214,10 @@ object Swerve : SubsystemBase() {
     private fun applySwerveState() {
         when (swerveState) {
             SwerveDriveState.FIELD_ORIENTED -> {
-                fieldDriveUsingController(XboxController(1), true)
+                fieldDriveUsingController(aacrn, true)
             }
             SwerveDriveState.SHOOTING -> {
-                fieldDriveUsingController(XboxController(1), false)
+                fieldDriveUsingController(aacrn, false)
             }
         }
     }
@@ -231,14 +232,14 @@ object Swerve : SubsystemBase() {
          */
 
         if (DriverStation.isTeleop()) {
-            val estimatedPose: EstimatedRobotPose? =
-                PhotonVision.getEstimatedGlobalPose(poseEstimator.estimatedPosition)
-            if (estimatedPose != null) {
-                val timestamp = estimatedPose.timestampSeconds
-                val visionMeasurement2d = estimatedPose.estimatedPose.toPose2d()
-                poseEstimator.addVisionMeasurement(visionMeasurement2d, timestamp)
-                currentPose = poseEstimator.estimatedPosition
-            }
+//            val estimatedPose: EstimatedRobotPose? =
+//                PhotonVision.getEstimatedGlobalPose(poseEstimator.estimatedPosition)
+//            if (estimatedPose != null) {
+//                val timestamp = estimatedPose.timestampSeconds
+//                val visionMeasurement2d = estimatedPose.estimatedPose.toPose2d()
+//                poseEstimator.addVisionMeasurement(visionMeasurement2d, timestamp)
+//                currentPose = poseEstimator.estimatedPosition
+//            }
         }
 
         /*
@@ -311,21 +312,23 @@ object Swerve : SubsystemBase() {
         if (abs(y) < Y_DEADZONE * MAX_SPEED) y = 0.0
         y *= if (slowmode) 0.25 else 1.0
 
-        val rotation = if(rotationOn){
-            if (abs(controller.rightX) >= 0.1) (-controller.rightX * MAX_ANGULAR_SPEED * if (slowmode) 0.0625 else 0.25) else 0.0
-        } else {
-            if (PhotonVision.fiducialId ==  7){
-                -1.0 * PhotonVision.yaw * VISION_TURN_kP * MAX_ANGULAR_SPEED
-            } else {
-                // Use hub positions instead
-                val targetYaw: Rotation2d = if(teamColor == "Blue"){
-                    PhotonUtils.getYawToPose(pose, BLUE_HUB_SCORE_POSITION.toPose2d())
-                } else {
-                    PhotonUtils.getYawToPose(pose, RED_HUB_SCORE_POSITION.toPose2d())
-                }
-                targetYaw.degrees
-            }
-        }
+//        val rotation = if(rotationOn){
+//            if (abs(controller.rightX) >= 0.1) (-controller.rightX * MAX_ANGULAR_SPEED * if (slowmode) 0.0625 else 0.25) else 0.0
+//        } else {
+//            if (PhotonVision.fiducialId ==  7){
+//                -1.0 * PhotonVision.yaw * VISION_TURN_kP * MAX_ANGULAR_SPEED
+//            } else {
+//                // Use hub positions instead
+//                val targetYaw: Rotation2d = if(teamColor == "Blue"){
+//                    PhotonUtils.getYawToPose(pose, BLUE_HUB_SCORE_POSITION.toPose2d())
+//                } else {
+//                    PhotonUtils.getYawToPose(pose, RED_HUB_SCORE_POSITION.toPose2d())
+//                }
+//                targetYaw.degrees
+//            }
+//        }
+
+        val rotation = if (abs(controller.rightX) >= 0.1) (-controller.rightX * MAX_ANGULAR_SPEED * if (slowmode) 0.0625 else 0.25) else 0.0
 
         // I don't know how logging works yet lol - Sam
 //        logs {
@@ -422,13 +425,7 @@ object Swerve : SubsystemBase() {
      * The states of the swerve modules
      */
     var moduleStates: Array<SwerveModuleState>
-        get() {
-            val moduleStates = emptyArray<SwerveModuleState>()
-            for (i in modules.indices) {
-                moduleStates[i] = modules[i].state
-            }
-            return moduleStates
-        }
+        get() = Array(modules.size) { i -> modules[i].state }
 
         set(states) {
             for (i in states.indices) {

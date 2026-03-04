@@ -15,19 +15,27 @@ import frc.robot.subsystems.Shooter
 import frc.robot.subsystems.ShooterCalculator
 import frc.robot.subsystems.Swerve
 import frc.robot.subsystems.Transport
+import frc.robot.utils.RobotParameters.ControllerConstants.aacrn
 import frc.robot.utils.RobotParameters.IntakeParameters.intakePivotState
 import frc.robot.utils.RobotParameters.IntakeParameters.intakeState
+import frc.robot.utils.RobotParameters.ShooterParameters.shooterState
 import frc.robot.utils.RobotParameters.SwerveParameters.swerveState
 import frc.robot.utils.RobotParameters.TransportParameters.transportState
 import frc.robot.utils.emu.IntakePivotState
 import frc.robot.utils.emu.IntakeState
+import frc.robot.utils.emu.ShooterState
 import frc.robot.utils.emu.SwerveDriveState
 import frc.robot.utils.emu.TransportState
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 import xyz.malefic.frc.emu.Button
 import xyz.malefic.frc.emu.Button.START
 import xyz.malefic.frc.emu.Button.Y
+import xyz.malefic.frc.emu.Button.A
+import xyz.malefic.frc.emu.Button.LEFT_BUMPER
+import xyz.malefic.frc.emu.Button.LEFT_TRIGGER
+import xyz.malefic.frc.emu.Button.X
 import xyz.malefic.frc.pingu.binding.Bingu.bindings
+import kotlin.math.log
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,7 +44,7 @@ import xyz.malefic.frc.pingu.binding.Bingu.bindings
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 class RobotContainer {
-    val pad: XboxController = XboxController(1)
+    val pad: XboxController = aacrn
 
     var networkChooser: LoggedDashboardChooser<Command?> = LoggedDashboardChooser("AutoChooser")
 
@@ -45,7 +53,7 @@ class RobotContainer {
         CommandScheduler.getInstance().registerSubsystem(
             Swerve,
             LED,
-            PhotonVision,
+//            PhotonVision,
             Intake,
             Transport,
             Shooter,
@@ -71,15 +79,17 @@ class RobotContainer {
             press(Y) { setTelePid() }
             press(START) { resetPidgey() }
 
-            hold(Button.RIGHT_TRIGGER) { swerveState = SwerveDriveState.SHOOTING }
-            release(Button.RIGHT_TRIGGER) { swerveState = SwerveDriveState.FIELD_ORIENTED }
-            hold(Button.LEFT_TRIGGER) { intakeState = IntakeState.INTAKE }
-            release(Button.LEFT_TRIGGER) { intakeState = IntakeState.STOP }
+            //hold(Button.RIGHT_TRIGGER) { swerveState = SwerveDriveState.SHOOTING }
+            //release(Button.RIGHT_TRIGGER) { swerveState = SwerveDriveState.FIELD_ORIENTED }
+            press(A) { intakeState = IntakeState.INTAKE }
+            release(A) { intakeState = IntakeState.STOP }
 
-            press(Button.A) { intakePivotState = IntakePivotState.DOWN }
-            press(Button.B) { intakePivotState = IntakePivotState.UP }
-            hold(Button.X) { transportState = TransportState.ON }
-            release(Button.X) { transportState = TransportState.STOP }
+//            press(Button.A) { intakePivotState = IntakePivotState.DOWN }
+//            press(Button.B) { intakePivotState = IntakePivotState.UP }
+            press(X) { transportState = TransportState.ON }
+            release(X) { transportState = TransportState.STOP }
+            press(Button.RIGHT_TRIGGER) { shooterState = ShooterState.FULL_SPEED }
+            release(Button.RIGHT_TRIGGER) { shooterState = ShooterState.OFF }
         }
     }
 

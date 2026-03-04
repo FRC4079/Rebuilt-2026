@@ -10,19 +10,23 @@ import frc.robot.utils.RobotParameters.ShooterParameters.CLOCKWISE_PINGU
 import frc.robot.utils.RobotParameters.ShooterParameters.HOOD_PINGU
 import frc.robot.utils.RobotParameters.ShooterParameters.shooterState
 import frc.robot.utils.RobotParameters.ShooterParameters.hoodState
+import frc.robot.utils.RobotParameters.TransportParameters.transportState
 import frc.robot.utils.emu.ShooterState
 // import xyz.malefic.frc.pingu.log.LogPingu.log
 import xyz.malefic.frc.pingu.motor.talonfx.TonguFX
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC
+import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.robot.utils.emu.HoodState
 import frc.robot.utils.emu.SwerveDriveState
 import frc.robot.utils.RobotParameters.SwerveParameters.swerveState
+import frc.robot.utils.emu.TransportState
 
 
 object Shooter : SubsystemBase() {
-    private val voltageControl: VelocityTorqueCurrentFOC = VelocityTorqueCurrentFOC(0.0)
+    private val voltageControl: VelocityVoltage = VelocityVoltage(0.0)
     private val positionRequest: MotionMagicVoltage = MotionMagicVoltage(0.0).withEnableFOC(true)
 
     private val shooterMotorClockwise =
@@ -51,18 +55,27 @@ object Shooter : SubsystemBase() {
 
     override fun periodic() {
 
-        shooterState = when (swerveState){
-            SwerveDriveState.FIELD_ORIENTED -> {ShooterState.OFF}
-            SwerveDriveState.SHOOTING -> {ShooterState.FULL_SPEED}
-        }
-
         hoodState = when (swerveState){
             SwerveDriveState.FIELD_ORIENTED -> {HoodState.STOP}
             SwerveDriveState.SHOOTING -> {HoodState.TRACKING}
         }
 
         if (hoodState == HoodState.TRACKING) {
-            aimHoodAtTarget(ShooterCalculator.currentInterceptSolution)
+            aimHood(2.0)
+        }
+
+
+
+//        if (hoodState == HoodState.TRACKING) {
+//            // aimHoodAtTarget(ShooterCalculator.currentInterceptSolution)
+//        }
+
+        if (transportState == TransportState.ON){
+            shooterState = ShooterState.REVERSE
+        }
+
+        if (transportState == TransportState.STOP && shooterState != ShooterState.FULL_SPEED) {
+            shooterState = ShooterState.OFF
         }
 
         setShooterSpeed(shooterState.velocity)
@@ -83,6 +96,10 @@ object Shooter : SubsystemBase() {
 //    fun setHoodSpeed(hoodPos: Double) {
 //        hoodMotor.setControl(positionRequest.withPosition(hoodSpeed))
 //    }
+
+    fun aimHood(rotations: Double) {
+        hoodMotor.setControl(positionRequest.withPosition(rotations))
+    }
 
     fun convertInterceptSolutionToPitch(interceptSolution: ShooterCalculator.InterceptSolution) : Double {
         // oough im magic number-ing it im magic number-ing it so good

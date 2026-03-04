@@ -7,6 +7,6 @@ package frc.robot.utils.emu
 enum class TransportState (
     val velocity: Double,
 ) {
-    ON(1.0),
+    ON(-9.0),
     STOP(0.0),
 }

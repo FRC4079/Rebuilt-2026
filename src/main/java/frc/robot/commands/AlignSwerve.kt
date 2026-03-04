@@ -37,9 +37,9 @@ class AlignSwerve : Command {
 
     /** The initial subroutine of a command. Called once when the command is initially scheduled.  */
     override fun initialize() {
-        yaw = PhotonVision.yaw
-        y = PhotonVision.y
-        dist = PhotonVision.dist
+//        yaw = PhotonVision.yaw
+//        y = PhotonVision.y
+//        dist = PhotonVision.dist
 
         rotationalController = ROTATIONAL_PID.pidController
         // with the L4 branches
@@ -61,9 +61,9 @@ class AlignSwerve : Command {
      * called repeatedly until [.isFinished]) returns true.)
      */
     override fun execute() {
-        yaw = PhotonVision.yaw
-        y = PhotonVision.y
-        dist = PhotonVision.dist
+//        yaw = PhotonVision.yaw
+//        y = PhotonVision.y
+//        dist = PhotonVision.dist
 
         Swerve
             .setDriveSpeeds(

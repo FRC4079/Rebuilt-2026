@@ -4,7 +4,7 @@ import groovy.json.JsonSlurper
 plugins {
     id "java"
     id 'org.jetbrains.kotlin.jvm'
-    alias(libs.plugins.gradleRIO)
+    alias(libs.plugins.gradleRIO) // version "2026.2.1"
     alias(libs.plugins.spotless)
     alias(libs.plugins.dokka)
 }

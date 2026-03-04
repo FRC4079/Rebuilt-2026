@@ -10,5 +10,5 @@ enum class IntakePivotState (
     /** Represents the intake motor at full power clockwise, intaking. */
     DOWN(10.0),
     /** Represents the intake motor at full power counter-clockwise, if you for some reason need this. */
-    UP(-10.0),
+    UP(0.0),
 }
